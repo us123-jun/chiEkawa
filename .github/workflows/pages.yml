@@ -25,10 +25,10 @@ jobs:
           mkdir -p _site
           python3 - <<'PY'
           from pathlib import Path
-          import os
+          import os, re
           html = Path('index.html').read_text()
-          assert html.count('content="__BUILD_ID__"') == 1
-          Path('_site/index.html').write_text(html.replace('content="__BUILD_ID__"', 'content="' + os.environ['BUILD_ID'] + '"'))
+          assert len(re.findall(r'<meta name="game-build" content="[^"]+">', html)) == 1
+          Path('_site/index.html').write_text(re.sub(r'(<meta name="game-build" content=")[^"]+(">)', lambda m: m[1] + os.environ['BUILD_ID'] + m[2], html))
           PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
