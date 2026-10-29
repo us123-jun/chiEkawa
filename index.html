@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="game-build" content="2026-10-29.5">
+<meta name="game-build" content="2026-10-29.6">
 <meta name="supabase-url" content="https://mhdqsjyypvppvmsosyts.supabase.co">
 <meta name="supabase-publishable-key" content="sb_publishable_ZIT0aw9b_fp-d2OngEAtBA_86z-oj2Q">
 <meta name="game-id" content="chiekawa-little-day">
@@ -22,7 +22,7 @@ body{padding-bottom:env(safe-area-inset-bottom,0px)}
 .character-modal{max-width:620px;width:100%;padding:32px;max-height:90vh;overflow:auto}.character-options{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:22px 0}.character-modal .character-choice{margin:0;padding:16px 12px;border-radius:22px;background:#fffefa;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .2s,border-color .2s}.character-choice:hover{border-color:#cc9879;transform:translateY(-3px)}.character-choice svg{width:100%;max-width:200px;aspect-ratio:1;overflow:hidden}.character-choice strong{font-size:20px}.character-choice span{font-size:11px;color:var(--muted)}.character-modal .choice-note{font-size:11px}.tag{background:transparent}#pet svg{overflow:hidden}.pet.sleeping svg{filter:none}.pet.sleeping{animation:breathe 4s ease-in-out infinite}#choice-modal[hidden]{display:none}
 @media(max-width:450px){.character-modal{padding:24px 16px}.character-options{gap:10px}.character-modal .character-choice{padding:10px 6px}.character-choice strong{font-size:17px}.character-choice span{font-size:10px}}
 
-.header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}#account-dialog{border:1px solid var(--line);border-radius:24px;background:var(--cream);color:var(--ink);padding:28px;width:min(440px,92vw);max-height:90dvh;overflow:auto}#account-dialog::backdrop{background:#493b3670}#account-dialog h2{font-size:22px;margin:14px 0}#account-dialog p{font-size:13px;line-height:1.7;color:var(--muted)}#account-dialog label{display:block;font-size:13px;margin:14px 0}#account-dialog input{display:block;width:100%;font:inherit;font-size:16px;margin-top:7px;padding:12px;border:1px solid #d9cbbb;border-radius:10px;background:white;color:var(--ink)}#account-dialog button{border:1px solid #d9cbbb;background:white;border-radius:10px;padding:10px 14px;margin:4px 4px 4px 0}#sign-in{background:#f7dfd1!important}#cloud-decision{padding:12px;background:#fbf0ce;border-radius:12px}#auth-message{min-height:24px;overflow-wrap:anywhere}#account-email{overflow-wrap:anywhere}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}#account-dialog{border:1px solid var(--line);border-radius:24px;background:var(--cream);color:var(--ink);padding:28px;width:min(440px,92vw);max-height:90dvh;overflow:auto}#account-dialog::backdrop{background:#493b3670}#account-dialog h2{font-size:22px;margin:14px 0}#account-dialog p{font-size:13px;line-height:1.7;color:var(--muted)}#account-dialog label{display:block;font-size:13px;margin:14px 0}#account-dialog input{display:block;width:100%;font:inherit;font-size:16px;margin-top:7px;padding:12px;border:1px solid #d9cbbb;border-radius:10px;background:white;color:var(--ink)}#account-dialog button{border:1px solid #d9cbbb;background:white;border-radius:10px;padding:10px 14px;margin:4px 4px 4px 0}#submit-signup{width:100%;background:#f7dfd1!important}#sign-in{background:#f7dfd1!important}#cloud-decision{padding:12px;background:#fbf0ce;border-radius:12px}#auth-message{min-height:24px;overflow-wrap:anywhere}#account-email{overflow-wrap:anywhere}
 @media(max-width:450px){header{align-items:flex-start}.header-actions{gap:4px}.brand{white-space:nowrap}.header-actions .tag{padding:6px 8px}}
 </style>
 </head>
@@ -72,7 +72,14 @@ body{padding-bottom:env(safe-area-inset-bottom,0px)}
 <div id="account-actions" hidden><p id="account-email"></p><button id="retry-cloud" type="button">계정 기록 다시 불러오기</button><button id="sign-out" type="button">로그아웃</button></div>
 <div id="recovery-fields" hidden><label>새 비밀번호<input id="new-password" type="password" autocomplete="new-password" minlength="8" maxlength="128"></label><button id="change-password" type="button">비밀번호 변경</button></div>
 <div id="cloud-decision" hidden><p>이 계정에는 아직 육성 기록이 없어요. 이 기기의 손님 기록을 가져올까요?</p><button id="import-guest" type="button">손님 기록 가져오기</button><button id="start-account" type="button">새로 시작하기</button></div>
-<p id="auth-message" role="status" aria-live="polite"></p><button type="button" id="close-account">닫기</button></form></dialog>
+<p id="auth-message" role="status" aria-live="polite"></p><button type="button" id="close-account">닫기</button></form>
+<form id="signup-form" hidden><div class="eyebrow">WELCOME, LITTLE FRIEND</div><h2 id="signup-title">새로운 친구가 되어 주세요</h2><p>이메일로 가입하고, 어디서든 함께 키워요.</p>
+<div id="signup-fields"><label>이메일<input id="signup-email" type="email" autocomplete="email" required maxlength="254" placeholder="name@example.com"></label>
+<label>비밀번호<input id="signup-password" type="password" autocomplete="new-password" required minlength="8" maxlength="128" placeholder="8자 이상 입력해 주세요"></label>
+<label>비밀번호 확인<input id="signup-confirm" type="password" autocomplete="new-password" required minlength="8" maxlength="128" placeholder="같은 비밀번호를 한 번 더 입력해 주세요"></label>
+<button id="submit-signup" type="submit">가입하기</button></div>
+<p id="signup-message" role="status" aria-live="polite"></p><button id="back-to-login" type="button">로그인으로 돌아가기</button><button id="close-signup" type="button">닫기</button>
+</form></dialog>
 
 <script>
 'use strict';
@@ -209,20 +216,23 @@ if(published){setInterval(checkForUpdate,60000);window.addEventListener('online'
  const get=id=>document.getElementById(id),bridge=window.gameAccount;
  const config={url:document.querySelector('meta[name="supabase-url"]').content,key:document.querySelector('meta[name="supabase-publishable-key"]').content};
  const dialog=get('account-dialog'),status=get('cloud-status');
- let client,user=null,loading=null,ready=false,dirty=false,conflict=false,saving=false,revision=0,generation=0,decisionResolve=null,recovery=false;
+ let client,user=null,loading=null,ready=false,dirty=false,conflict=false,saving=false,revision=0,generation=0,decisionResolve=null,recovery=false,authView='login';
  const accountKey=id=>bridge.guestKey+':account:'+id;
  const syncKey=id=>bridge.guestKey+':sync:'+id;
  function read(key){try{return JSON.parse(localStorage.getItem(key));}catch{return null;}}
  function meta(pending){if(!user)return;try{localStorage.setItem(syncKey(user.id),JSON.stringify({revision,pending}));}catch{}}
- function message(text){get('auth-message').textContent=text;}
+ function message(text){get(authView==='signup'?'signup-message':'auth-message').textContent=text;}
  function ui(){
+  if(user||recovery)authView='login';
+  get('account-form').hidden=authView==='signup';get('signup-form').hidden=authView!=='signup';
+  dialog.setAttribute('aria-labelledby',authView==='signup'?'signup-title':'account-title');
   get('auth-fields').hidden=!!user||recovery;get('account-actions').hidden=!user||recovery;get('recovery-fields').hidden=!recovery;
   get('new-password').required=recovery;get('auth-password').required=!user&&!recovery;
   get('auth-email').required=!user&&!recovery;
   get('account-email').textContent=user?.email||'';get('account-button').textContent=user?'내 계정':'로그인';
  }
- function open(){ui();dialog.showModal();(user?get('close-account'):get('auth-email')).focus();}
- get('account-button').onclick=()=>{open();if(!client)message('로그인은 아직 준비 중이에요. 지금은 손님으로 계속 키울 수 있어요.');};
+ function open(){ui();dialog.showModal();(authView==='signup'?get('signup-email'):user?get('close-account'):get('auth-email')).focus();}
+ get('account-button').onclick=()=>{authView='login';open();if(!client)message('로그인은 아직 준비 중이에요. 지금은 손님으로 계속 키울 수 있어요.');};
  get('close-account').onclick=()=>{if(decisionResolve){message('기록을 가져올지 새로 시작할지 먼저 골라 주세요.');return;}dialog.close();};
  dialog.addEventListener('cancel',e=>{if(decisionResolve)e.preventDefault();});
  function chooseImport(){
@@ -298,12 +308,32 @@ if(published){setInterval(checkForUpdate,60000);window.addEventListener('online'
  };
  async function action(work){
   if(!client){message('로그인은 아직 준비 중이에요. 손님으로 계속 키울 수 있어요.');return;}
-  const buttons=[...get('account-form').querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);
+  const buttons=[...dialog.querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);
   try{await work();}catch(error){message(authError(error));}finally{buttons.forEach(b=>b.disabled=false);get('auth-password').value='';}
  }
  function values(){return {email:get('auth-email').value.trim(),password:get('auth-password').value};}
  get('account-form').onsubmit=e=>{e.preventDefault();if(recovery){get('change-password').click();return;}if(user)return;action(async()=>{const {error}=await client.auth.signInWithPassword(values());if(error)throw error;message('로그인 중…');});};
- get('sign-up').onclick=()=>{if(!get('account-form').reportValidity())return;action(async()=>{const {data,error}=await client.auth.signUp({...values(),options:{emailRedirectTo:location.origin+location.pathname}});if(error)throw error;message(data.session?'가입했어요. 기록을 연결하고 있어요.':'메일함에서 인증 링크를 눌러 가입을 완료해 주세요.');});};
+ get('sign-up').onclick=()=>{
+  authView='signup';get('signup-fields').hidden=false;get('signup-message').textContent='';
+  get('signup-email').value=get('auth-email').value.trim();get('signup-password').value='';get('signup-confirm').value='';get('signup-confirm').setCustomValidity('');get('auth-password').value='';
+  ui();get('signup-email').focus();
+ };
+ get('back-to-login').onclick=()=>{
+  get('auth-email').value=get('signup-email').value.trim();get('signup-password').value='';get('signup-confirm').value='';
+  authView='login';get('auth-message').textContent='';ui();get('auth-password').focus();
+ };
+ get('close-signup').onclick=()=>dialog.close();
+ function validateConfirmation(){get('signup-confirm').setCustomValidity(get('signup-password').value===get('signup-confirm').value?'':'비밀번호가 서로 달라요. 같은 비밀번호를 입력해 주세요.');}
+ get('signup-confirm').addEventListener('input',validateConfirmation);get('signup-password').addEventListener('input',validateConfirmation);
+ get('signup-form').onsubmit=e=>{
+  e.preventDefault();validateConfirmation();if(!get('signup-form').reportValidity())return;
+  action(async()=>{
+   const email=get('signup-email').value.trim(),password=get('signup-password').value;
+   const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});if(error)throw error;
+   get('auth-email').value=email;get('signup-password').value='';get('signup-confirm').value='';get('signup-fields').hidden=true;
+   message(data.session?'가입했어요. 기록을 연결하고 있어요.':'인증 메일을 보냈어요. 메일함에서 인증 링크를 누른 뒤 로그인해 주세요. 스팸함도 확인해 주세요.');
+  });
+ };
  get('forgot-password').onclick=()=>{if(!get('auth-email').reportValidity())return;action(async()=>{const {error}=await client.auth.resetPasswordForEmail(get('auth-email').value.trim(),{redirectTo:location.origin+location.pathname});if(error)throw error;message('가입된 이메일이라면 비밀번호 재설정 메일이 전송돼요.');});};
  get('change-password').onclick=()=>{if(!get('new-password').reportValidity()||get('new-password').value.length<8)return;action(async()=>{const {error}=await client.auth.updateUser({password:get('new-password').value});if(error)throw error;get('new-password').value='';recovery=false;ui();message('비밀번호를 변경했어요.');});};
  get('sign-out').onclick=()=>action(async()=>{

@@ -16,7 +16,7 @@ window.__mockSupabase={createClient:()=>({auth:{
  onAuthStateChange(cb){callback=cb;return {data:{subscription:{unsubscribe(){}}}}},
  async getSession(){return {data:{session},error:null}},
  async signInWithPassword({email,password}){if(password==='bad-password')return {error:{code:'invalid_credentials'}};session={user:{id:email,email}};callback('SIGNED_IN',session);return {data:{session},error:null}},
- async signUp(){return {data:{session:null},error:null}},
+ async signUp(){window.__signups=(window.__signups||0)+1;return {data:{session:null},error:null}},
  async resetPasswordForEmail(){return {data:{},error:null}},
  async updateUser(){return {data:{},error:null}},
  async signOut(){session=null;callback('SIGNED_OUT',null);return {error:null}}
@@ -59,8 +59,20 @@ with sync_playwright() as p:
  assert not errors,errors
  print('PASS no JS errors and mobile layout')
  c2=b.new_context();c2.add_init_script(mock);p2=c2.new_page();p2.goto(f'http://127.0.0.1:{server.server_port}/')
- p2.locator('.character-choice[data-character="chiikawa"]').click();p2.locator('#account-button').click();p2.locator('#auth-email').fill('new@example.com');p2.locator('#auth-password').fill('password123');p2.locator('#sign-up').click()
- p2.wait_for_function("document.querySelector('#auth-message').textContent.includes('인증 링크')")
+ p2.locator('.character-choice[data-character="chiikawa"]').click();p2.locator('#account-button').click();p2.locator('#sign-up').click()
+ assert p2.locator('#signup-form').is_visible() and p2.locator('#account-form').is_hidden()
+ assert p2.locator('#signup-email').evaluate('(el)=>el===document.activeElement')
+ p2.set_viewport_size({'width':375,'height':900});assert p2.evaluate('document.documentElement.scrollWidth<=innerWidth')
+ p2.locator('#account-dialog').screenshot(path='/tmp/chiekawa-signup.png')
+ p2.locator('#signup-email').fill('new@example.com');p2.locator('#signup-password').fill('password123');p2.locator('#signup-confirm').fill('different123');p2.locator('#submit-signup').click()
+ assert p2.evaluate('window.__signups||0')==0
+ p2.locator('#signup-confirm').fill('password123');p2.locator('#submit-signup').click()
+ p2.wait_for_function("document.querySelector('#signup-message').textContent.includes('인증 링크')")
+ assert p2.evaluate('window.__signups')==1
+ assert p2.locator('#signup-fields').is_hidden()
+ p2.locator('#back-to-login').click();assert p2.locator('#account-form').is_visible()
+ assert p2.locator('#auth-email').input_value()=='new@example.com'
+
  p2.locator('#forgot-password').click();p2.wait_for_function("document.querySelector('#auth-message').textContent.includes('재설정 메일')")
  p2.locator('#auth-password').fill('bad-password');p2.locator('#sign-in').click();p2.wait_for_function("document.querySelector('#auth-message').textContent.includes('맞지 않아요')")
  print('PASS signup confirmation, reset request and wrong-password feedback (mock responses)')
