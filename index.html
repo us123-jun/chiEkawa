@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="game-build" content="2026-10-29.3">
+<meta name="game-build" content="2026-10-29.4">
 <meta name="game-id" content="chiekawa-little-day">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#fff9f3">
@@ -34,7 +34,7 @@ body{padding-bottom:env(safe-area-inset-bottom,0px)}
 <section class="room card" id="room" aria-label="치이카와의 방">
 <div class="room-top"><span class="pill" id="stage">🌱 아기 치이카와</span><span class="season">포근한 우리 집</span></div>
 <div class="window" aria-hidden="true"></div><div class="flower" aria-hidden="true">🌼</div><div class="floor"></div><div class="rug"></div>
-<div class="speech" id="speech" role="status" aria-live="polite">와아…! 만나서 반가워!</div><span class="sleep-symbol" aria-hidden="true">z Z</span>
+<div class="speech" id="speech" role="status" aria-live="polite">…</div><span class="sleep-symbol" aria-hidden="true">z Z</span>
 <div class="pet" id="pet"><svg viewBox="0 0 1 1" width="260" height="260" role="img" aria-label="함께할 친구"><use id="pet-sprite" href="#atlas-chiikawa"/></svg></div><span class="room-note">작은 행복이 쌓이는 중 · · ·</span>
 </section>
 <div class="right">
@@ -73,8 +73,41 @@ for(const k of ['hunger','happy','energy'])state[k]=clamp(state[k]);
 const level=()=>1+Math.floor(state.xp/100);
 const characterName=()=>state.character==='momonga'?'모몽가':'치이카와';
 const stage=()=>level()>=8?'🌟 가장 소중한 친구':level()>=5?'🌷 씩씩한 '+characterName():level()>=3?'🌿 자라는 '+characterName():'🌱 아기 '+characterName();
+// Short original reactions inspired by each character's personality.
+const dialogue={
+ chiikawa:{
+  meet:['와…! 에헤헤…','아…! 응…!','에헤… 헤헤…'],
+  eat:['와아…! 냠… 냠…','하음…! 음…!','냠냠… 에헤헤…'],
+  pet:['에헤헤…','응…! 헤헤…','와… 따뜻해…'],
+  play:['와아아…! 야하…!','얏…! 와아…!','꺄…! 에헤헤…!'],
+  sleep:['후아암… 스으…','스으… 스으…','음냐… 스으…'],
+  wake:['후아… 응…!','음…! 와아…','아…! 에헤헤…'],
+  hungry:['아… 우… (꼬르륵)','음… 아… (꼬르륵)','우우… (꼬르륵)'],
+  grow:['와… 와아…!','얏…! 에헤헤…!','응…! 와아아…!']
+ },
+ momonga:{
+  meet:['귀여운 내가 왔다! 어서 예뻐해 줘!','자, 이 귀여움을 마음껏 봐라!','기다렸지? 이제 나한테 집중해!'],
+  eat:['맛있는 거 내놔! …음! 더 줘!','냠냠! 귀여운 내가 먹는 모습도 봐라!','한 입 더! 아직 먹을 수 있거든!'],
+  pet:['더 쓰다듬어! 귀엽다고도 해 줘!','그렇지, 그렇지! 더 예뻐해 봐!','봐! 쓰다듬을 때도 귀엽지!'],
+  play:['나랑 놀아 줘! 내가 제일 잘하지!','봤냐! 이렇게나 잘한다고!','자, 한 번 더! 나만 보고 있어!'],
+  sleep:['이제 잘 거야! 조용히 해 줘!','자는 모습도 귀엽겠지만… 깨우진 마!','푹신한 데 내놔… 졸리단 말이야…'],
+  wake:['일어났다! 어서 귀엽다고 해 줘!','잘 잤으니까 이제 나랑 놀아 줘!','기다렸지? 다시 나만 봐라!'],
+  hungry:['배고파! 맛있는 거 빨리 내놔!','뭐 먹을 거 없어? 내가 기다리잖아!','이렇게 귀여운데 밥도 안 줄 거야?'],
+  grow:['봐라! 더 귀여워졌지! 칭찬해 줘!','이 정도면 엄청나지! 더 예뻐해라!','또 자랐다! 귀여움도 늘었다고!']
+ }
+};
+const lastDialogue={};
+function line(event){
+ const character=state.character||'chiikawa';
+ const options=dialogue[character][event];
+ const key=character+':'+event;
+ const available=options.filter(text=>text!==lastDialogue[key]);
+ const text=available[Math.floor(Math.random()*available.length)];
+ lastDialogue[key]=text;
+ return text;
+}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));saveOK=true;}catch{saveOK=false;}$('save-status').textContent=saveOK?'이 브라우저에 자동으로 저장돼요.':'저장할 수 없어요. 이 창을 닫으면 진행 상황이 사라질 수 있어요.';$('save-status').classList.toggle('save-warning',!saveOK);}
-function advance(){const now=Date.now(),elapsed=Math.min(8*3600000,Math.max(0,now-state.updated));if(state.sleeping){state.energy=clamp(state.energy+elapsed/3000*8);state.hunger=clamp(state.hunger-elapsed/60000);if(state.energy>=100){state.sleeping=false;say('후아암… 잘 잤다! 같이 놀자!');}}else{state.hunger=clamp(state.hunger-elapsed/60000*2);state.happy=clamp(state.happy-elapsed/60000);state.energy=clamp(state.energy-elapsed/60000);}state.updated=now;}
+function advance(){const now=Date.now(),elapsed=Math.min(8*3600000,Math.max(0,now-state.updated));if(state.sleeping){state.energy=clamp(state.energy+elapsed/3000*8);state.hunger=clamp(state.hunger-elapsed/60000);if(state.energy>=100){state.sleeping=false;say(line('wake'));}}else{state.hunger=clamp(state.hunger-elapsed/60000*2);state.happy=clamp(state.happy-elapsed/60000);state.energy=clamp(state.energy-elapsed/60000);}state.updated=now;}
 function say(message){$('speech').textContent=message;}
 let happyUntil=0,reaction='play';
 function renderExpression(){
@@ -91,19 +124,19 @@ function renderExpression(){
 const choice=$('choice-modal');
 function openChoice(){choice.hidden=false;document.querySelector('main').inert=true;document.querySelector('header').inert=true;$('cancel-choice').hidden=!state.character;choice.querySelector('[data-character]').focus();}
 function closeChoice(){if(!state.character)return;choice.hidden=true;document.querySelector('main').inert=false;document.querySelector('header').inert=false;$('choose-button').focus();}
-document.querySelectorAll('[data-character]').forEach(button=>button.onclick=()=>{state.character=button.dataset.character;happyUntil=0;state.updated=Date.now();closeChoice();render();save();say(characterName()+'와 함께하는 작은 하루!');$('journal').textContent=characterName()+'와 함께해요. 성장과 동전은 소중히 이어집니다.';});
+document.querySelectorAll('[data-character]').forEach(button=>button.onclick=()=>{state.character=button.dataset.character;happyUntil=0;state.updated=Date.now();closeChoice();render();save();say(line(state.sleeping?'sleep':state.hunger<25?'hungry':'meet'));$('journal').textContent=characterName()+'와 함께해요. 성장과 동전은 소중히 이어집니다.';});
 $('choose-button').onclick=openChoice;$('cancel-choice').onclick=closeChoice;
 choice.addEventListener('keydown',e=>{if(e.key==='Escape'){closeChoice();return;}if(e.key!=='Tab')return;const buttons=[...choice.querySelectorAll('button')].filter(b=>!b.hidden);const i=buttons.indexOf(document.activeElement);e.preventDefault();buttons[(i+(e.shiftKey?-1:1)+buttons.length)%buttons.length].focus();});
 function feedback(message,icon,activity='play'){reaction=activity;happyUntil=Date.now()+3500;renderExpression();say(message);$('journal').textContent=message;const el=document.createElement('span');el.className='floating';el.textContent=icon;el.setAttribute('aria-hidden','true');$('room').append(el);setTimeout(()=>el.remove(),1100);$('pet').classList.remove('hop');void $('pet').offsetWidth;$('pet').classList.add('hop');setTimeout(()=>$('pet').classList.remove('hop'),1000);}
-function grow(amount){const before=level();state.xp+=amount;if(level()>before){$('journal').textContent=`반짝! 레벨 ${level()}이 되었어요. ${stage().slice(3)}로 한 뼘 더 자랐어요.`;say('와아! 나 조금 더 자랐어! ✨');}}
+function grow(amount){const before=level();state.xp+=amount;if(level()>before){$('journal').textContent=`반짝! 레벨 ${level()}이 되었어요. ${stage().slice(3)}로 한 뼘 더 자랐어요.`;say(line('grow'));}}
 function render(){renderExpression();$('intro-text').textContent='맛있는 한 끼와 다정한 손길로 '+characterName()+'를 키워 주세요.';$('room').setAttribute('aria-label',characterName()+'의 방');for(const k of ['hunger','happy','energy']){$(k+'-fill').style.width=state[k]+'%';$(k+'-value').textContent=Math.round(state[k]);$(k+'-bar').setAttribute('aria-valuenow',Math.round(state[k]));}const xp=state.xp%100;$('xp-fill').style.width=xp+'%';$('xp-label').textContent=xp+' / 100';$('xp-bar').setAttribute('aria-valuenow',xp);$('growth-note').textContent=`다음 레벨까지 ${100-xp} 경험치 · 맛있게 먹고 즐겁게 놀아요`;$('stage').textContent=stage();$('level').textContent='Lv. '+level();$('coins').textContent=state.coins;$('pet').style.width=(235+Math.min(25,(level()-1)*3))+'px';$('pet').classList.toggle('sleeping',state.sleeping);$('room').classList.toggle('asleep',state.sleeping);$('sleep-label').textContent=state.sleeping?'일어나기':'낮잠 자기';$('sleep-hint').textContent=state.sleeping?'충분히 쉬었나요?':'에너지 회복';$('sleep-button').setAttribute('aria-pressed',String(state.sleeping));const now=Date.now();$('pet-button').disabled=state.sleeping||now-state.lastPet<4000||state.happy>=100;$('play-button').disabled=state.sleeping||state.energy<15||state.hunger<10||now-state.lastPlay<10000;menu.forEach((food,i)=>{const btn=$('food-'+i);btn.disabled=state.sleeping||state.hunger>=95||state.coins<food.cost||now-state.lastFeed<2500;btn.title=state.sleeping?'잠에서 깨면 먹을 수 있어요':state.hunger>=95?'아직 배가 불러요':state.coins<food.cost?'함께 놀며 동전을 모아 주세요':now-state.lastFeed<2500?'천천히 꼭꼭 씹는 중이에요':food.name+' 먹이기';});}
-menu.forEach((food,i)=>{const button=document.createElement('button');button.id='food-'+i;button.className='food';button.innerHTML=`<span class="food-icon" aria-hidden="true">${food.icon}</span><strong>${food.name}</strong><span class="effect">포만감 +${food.hunger} · 행복 +${food.happy}</span><span class="price">${food.cost?'🪙 '+food.cost+' 동전':'언제나 무료'}</span>`;button.setAttribute('aria-label',`${food.name} 먹이기, ${food.cost} 동전`);button.onclick=()=>{advance();if(!state.character||state.sleeping||state.hunger>=95||state.coins<food.cost||Date.now()-state.lastFeed<2500)return;state.coins-=food.cost;state.hunger=clamp(state.hunger+food.hunger);state.happy=clamp(state.happy+food.happy);state.lastFeed=Date.now();state.meals++;feedback(`${food.name}, 냠냠! 맛있어서 행복해…!`,food.icon,'eat');grow(food.xp);render();save();};$('foods').append(button);});
-$('pet-button').onclick=()=>{advance();if(!state.character||state.sleeping||state.happy>=100||Date.now()-state.lastPet<4000)return;state.happy=clamp(state.happy+8);state.lastPet=Date.now();feedback('헤헤… 따뜻해. 한 번 더 쓰다듬어 줘!', '💕');grow(3);render();save();};
-$('play-button').onclick=()=>{advance();if(!state.character||state.sleeping||state.energy<15||state.hunger<10||Date.now()-state.lastPlay<10000)return;state.energy=clamp(state.energy-15);state.hunger=clamp(state.hunger-5);state.happy=clamp(state.happy+12);state.coins+=12;state.lastPlay=Date.now();feedback('데굴데굴! 같이 놀고 동전 12개를 찾았어!', '🧶');grow(12);render();save();};
-$('sleep-button').onclick=()=>{if(!state.character)return;advance();state.sleeping=!state.sleeping;feedback(state.sleeping?'쿨쿨… 포근한 꿈을 꿀 거야.':'후아암… 잘 잤다! 고마워.',state.sleeping?'🌙':'☀️');render();save();};
-const modal=$('reset-modal');$('reset-button').onclick=()=>{modal.hidden=false;$('cancel-reset').focus();};function closeModal(){modal.hidden=true;$('reset-button').focus();}$('cancel-reset').onclick=closeModal;$('confirm-reset').onclick=()=>{state=fresh();feedback('와아…! 우리 다시 행복한 하루를 만들어 가자!','🌱');render();save();closeModal();openChoice();};modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});modal.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.key==='Tab'){e.preventDefault();(document.activeElement===$('cancel-reset')?$('confirm-reset'):$('cancel-reset')).focus();}});
+menu.forEach((food,i)=>{const button=document.createElement('button');button.id='food-'+i;button.className='food';button.innerHTML=`<span class="food-icon" aria-hidden="true">${food.icon}</span><strong>${food.name}</strong><span class="effect">포만감 +${food.hunger} · 행복 +${food.happy}</span><span class="price">${food.cost?'🪙 '+food.cost+' 동전':'언제나 무료'}</span>`;button.setAttribute('aria-label',`${food.name} 먹이기, ${food.cost} 동전`);button.onclick=()=>{advance();if(!state.character||state.sleeping||state.hunger>=95||state.coins<food.cost||Date.now()-state.lastFeed<2500)return;state.coins-=food.cost;state.hunger=clamp(state.hunger+food.hunger);state.happy=clamp(state.happy+food.happy);state.lastFeed=Date.now();state.meals++;feedback(line('eat'),food.icon,'eat');grow(food.xp);render();save();};$('foods').append(button);});
+$('pet-button').onclick=()=>{advance();if(!state.character||state.sleeping||state.happy>=100||Date.now()-state.lastPet<4000)return;state.happy=clamp(state.happy+8);state.lastPet=Date.now();feedback(line('pet'), '💕');grow(3);render();save();};
+$('play-button').onclick=()=>{advance();if(!state.character||state.sleeping||state.energy<15||state.hunger<10||Date.now()-state.lastPlay<10000)return;state.energy=clamp(state.energy-15);state.hunger=clamp(state.hunger-5);state.happy=clamp(state.happy+12);state.coins+=12;state.lastPlay=Date.now();feedback(line('play'), '🧶');grow(12);render();save();};
+$('sleep-button').onclick=()=>{if(!state.character)return;advance();state.sleeping=!state.sleeping;feedback(line(state.sleeping?'sleep':'wake'),state.sleeping?'🌙':'☀️');render();save();};
+const modal=$('reset-modal');$('reset-button').onclick=()=>{modal.hidden=false;$('cancel-reset').focus();};function closeModal(){modal.hidden=true;$('reset-button').focus();}$('cancel-reset').onclick=closeModal;$('confirm-reset').onclick=()=>{state=fresh();feedback('새로운 친구와 작은 하루를 시작해요.','🌱');render();save();closeModal();openChoice();};modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});modal.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.key==='Tab'){e.preventDefault();(document.activeElement===$('cancel-reset')?$('confirm-reset'):$('cancel-reset')).focus();}});
 if(!state.character)openChoice();else choice.hidden=true;
-advance();if(state.sleeping)say('쿨쿨… 포근한 꿈을 꾸는 중.');else if(state.hunger<25)say('꼬르륵… 맛있는 밥 먹고 싶어.');render();save();setInterval(()=>{advance();render();save();},1000);document.addEventListener('visibilitychange',()=>{advance();render();save();});
+advance();if(state.character)say(line(state.sleeping?'sleep':state.hunger<25?'hungry':'meet'));render();save();setInterval(()=>{advance();render();save();},1000);document.addEventListener('visibilitychange',()=>{advance();render();save();});
 
 // Downloaded HTML stays standalone. Only the published site checks for builds.
 const buildId=document.querySelector('meta[name="game-build"]').content;
