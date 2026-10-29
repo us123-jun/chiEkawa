@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="game-build" content="2026-10-29.6">
+<meta name="game-build" content="2026-10-30.1">
 <meta name="supabase-url" content="https://mhdqsjyypvppvmsosyts.supabase.co">
 <meta name="supabase-publishable-key" content="sb_publishable_ZIT0aw9b_fp-d2OngEAtBA_86z-oj2Q">
 <meta name="game-id" content="chiekawa-little-day">
@@ -24,6 +24,48 @@ body{padding-bottom:env(safe-area-inset-bottom,0px)}
 
 .header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}#account-dialog{border:1px solid var(--line);border-radius:24px;background:var(--cream);color:var(--ink);padding:28px;width:min(440px,92vw);max-height:90dvh;overflow:auto}#account-dialog::backdrop{background:#493b3670}#account-dialog h2{font-size:22px;margin:14px 0}#account-dialog p{font-size:13px;line-height:1.7;color:var(--muted)}#account-dialog label{display:block;font-size:13px;margin:14px 0}#account-dialog input{display:block;width:100%;font:inherit;font-size:16px;margin-top:7px;padding:12px;border:1px solid #d9cbbb;border-radius:10px;background:white;color:var(--ink)}#account-dialog button{border:1px solid #d9cbbb;background:white;border-radius:10px;padding:10px 14px;margin:4px 4px 4px 0}#submit-signup{width:100%;background:#f7dfd1!important}#sign-in{background:#f7dfd1!important}#cloud-decision{padding:12px;background:#fbf0ce;border-radius:12px}#auth-message{min-height:24px;overflow-wrap:anywhere}#account-email{overflow-wrap:anywhere}
 @media(max-width:450px){header{align-items:flex-start}.header-actions{gap:4px}.brand{white-space:nowrap}.header-actions .tag{padding:6px 8px}}
+
+/* Keep the active character and speech visible while portrait-phone controls scroll. */
+@media (max-width:650px) and (orientation:portrait){
+ html{scroll-padding-top:calc(clamp(230px,35vh,300px) + 24px + env(safe-area-inset-top,0px));scroll-padding-top:calc(clamp(230px,35svh,300px) + 24px + env(safe-area-inset-top,0px))}
+ main{display:flex;flex-direction:column;gap:14px;padding-top:0}
+ .layout,.right{display:contents}
+ .intro{order:0;margin:0 0 2px}
+ .room{order:1;position:sticky;top:calc(8px + env(safe-area-inset-top,0px));z-index:5;flex:none;height:clamp(230px,35vh,300px);height:clamp(230px,35svh,300px);min-height:0;box-shadow:0 5px 16px #6c47331a}
+ .room-top{padding:8px 12px}
+ .room .pill{font-size:10px;padding:5px 9px}
+ .room .season{font-size:10px}
+ .room .speech{position:absolute;top:38px;margin:0;max-width:90%;min-height:30px;padding:6px 12px;font-size:12px;line-height:1.5}
+ .room .pet{position:absolute;bottom:11px;left:0;right:0;margin:0 auto;width:clamp(130px,22vh,180px)!important;width:clamp(130px,22svh,180px)!important;max-width:55%}
+ .room .pet.hop{animation:portrait-hop .5s ease-in-out 2}
+ @keyframes portrait-hop{25%,75%{transform:translateY(-8px) rotate(-4deg)}50%{transform:rotate(4deg)}}
+ .room .window{top:78px;right:18px;width:60px;height:72px;border-width:5px}
+ .room .flower{top:105px;left:18px;font-size:24px}
+ .room .floor{height:55px}
+ .room .rug{bottom:6px;width:185px;height:35px;border-width:5px}
+ .room-note{display:none}
+ .room .sleep-symbol{top:105px;right:calc(50% - 90px);font-size:20px}
+ .room .floating{top:auto;bottom:70px;left:calc(50% + 55px);font-size:28px}
+ .care{order:2;padding:12px}
+ .care h2{font-size:13px;margin-bottom:10px}
+ .action{padding:9px 3px}
+ .action .emoji{font-size:24px;margin-bottom:4px}
+ .action small{margin-top:4px}
+ .food-card{order:3;margin:0;padding:14px}
+ .food-head{margin-bottom:12px}
+ .food-head h2{font-size:15px}
+ .food-head h2 span{font-size:11px;margin-top:4px}
+ .foods{gap:8px}
+ .food{gap:5px;padding:10px 6px}
+ .food-icon{font-size:28px}
+ .price{padding:4px 8px}
+ .profile{order:4}
+ .journal{order:5;margin:0}
+ details{order:6;margin:0}
+ #cloud-status{order:7;margin:0}
+ #update-status{order:8;margin:0}
+ footer{order:9;margin:0}
+}
 </style>
 </head>
 <body>
