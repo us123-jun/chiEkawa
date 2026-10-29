@@ -1,0 +1,22 @@
+import {PGlite} from '@electric-sql/pglite';
+import {readFileSync} from 'node:fs';
+import assert from 'node:assert/strict';
+const db=new PGlite();
+const a='11111111-1111-4111-8111-111111111111',b='22222222-2222-4222-8222-222222222222';
+await db.exec(`create role authenticated;create role anon;create schema auth;create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth,public to authenticated,anon;grant execute on function auth.uid() to authenticated,anon;insert into auth.users values ('${a}'),('${b}');`);
+await db.exec(readFileSync(new URL('../supabase/schema.sql',import.meta.url),'utf8'));
+async function user(id){await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[id]);await db.exec('set role authenticated');}
+await user(a);
+let result=await db.query('select public.save_game($1::jsonb,0) as revision',[JSON.stringify({character:'momonga',coins:30})]);assert.equal(Number(result.rows[0].revision),1);
+await assert.rejects(db.query('select public.save_game($1::jsonb,0)',[JSON.stringify({coins:999})]),/SAVE_CONFLICT/);
+result=await db.query('select state from public.game_saves');assert.equal(result.rows[0].state.coins,30);
+await user(b);result=await db.query('select * from public.game_saves');assert.equal(result.rows.length,0);
+await assert.rejects(db.query('insert into public.game_saves(user_id,state) values ($1,$2::jsonb)',[a,JSON.stringify({coins:999})]),/row-level security/);
+result=await db.query('update public.game_saves set state=$1::jsonb where user_id=$2 returning user_id',[JSON.stringify({coins:999}),a]);assert.equal(result.rows.length,0);
+await db.query('select public.save_game($1::jsonb,0)',[JSON.stringify({character:'chiikawa',coins:50})]);
+await user(a);result=await db.query('select state from public.game_saves');assert.equal(result.rows.length,1);assert.equal(result.rows[0].state.coins,30);
+await assert.rejects(db.query('select public.save_game($1::jsonb,1)',[JSON.stringify({text:'a'.repeat(17000)})]),/check constraint/);
+await db.exec('reset role;set role anon');await assert.rejects(db.query('select * from public.game_saves'),/permission denied/);await assert.rejects(db.query("select public.save_game('{}'::jsonb,0)"),/permission denied/);
+await user('');await assert.rejects(db.query("select public.save_game('{}'::jsonb,0)"),/AUTH_REQUIRED/);
+console.log('PASS PostgreSQL SQL execution, own save, stale revision rejection, A/B RLS read/write isolation, oversized state rejection, anonymous access rejection');
+await db.close();
